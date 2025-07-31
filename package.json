@@ -1,0 +1,48 @@
+{
+  "name": "electron-dash-autoupdate",
+  "version": "1.0.0",
+  "description": "An Electron app with embedded Dash Python app and auto-update functionality",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-python": "pyinstaller --onefile --distpath dist/python dash_app.py",
+    "dev": "electron . --dev",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "publish": "electron-builder --publish=always"
+  },
+  "build": {
+    "appId": "com.example.electron-dash-autoupdate",
+    "productName": "Dash Auto Update Demo",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "dist/python/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "target": {
+        "target": "dmg",
+        "arch": ["arm64"]
+      },
+      "category": "public.app-category.developer-tools"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "your-username",
+      "repo": "electron-dash-autoupdate"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
