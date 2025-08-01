@@ -8,6 +8,7 @@ let mainWindow;
 let dashProcess;
 
 // Configure auto-updater
+console.log('App version:', app.getVersion());
 autoUpdater.checkForUpdatesAndNotify();
 
 function createWindow() {
@@ -103,15 +104,15 @@ autoUpdater.on('checking-for-update', () => {
 });
 
 autoUpdater.on('update-available', (info) => {
-  console.log('Update available.');
+  console.log('Update available:', info.version);
 });
 
 autoUpdater.on('update-not-available', (info) => {
-  console.log('Update not available.');
+  console.log('Update not available. Current version:', info.version);
 });
 
 autoUpdater.on('error', (err) => {
-  console.log('Error in auto-updater. ' + err);
+  console.log('Error in auto-updater:', err);
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
@@ -122,6 +123,6 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded');
+  console.log('Update downloaded:', info.version);
   autoUpdater.quitAndInstall();
 });
