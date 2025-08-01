@@ -33,7 +33,15 @@
       "gatekeeperAssess": false,
       "hardenedRuntime": false,
       "entitlements": null,
-      "entitlementsInherit": null
+      "entitlementsInherit": null,
+      "extendInfo": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "dmg": {
+      "sign": false
     },
     "publish": {
       "provider": "github",
