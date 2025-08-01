@@ -1,5 +1,11 @@
 const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const { autoUpdater } = require('electron-updater');
+
+// Configure auto-updater to skip signature verification for unsigned apps
+process.env.ELECTRON_IS_DEV = false;
+process.env.ELECTRON_UPDATER_ALLOW_UNSIGNED = true;
+autoUpdater.disableWebInstaller = true;
+autoUpdater.forceDevUpdateConfig = false;
 const path = require('path');
 const { spawn } = require('child_process');
 const http = require('http');
@@ -20,6 +26,11 @@ console.log('======================');
 // Clear any cached update info
 autoUpdater.allowDowngrade = false;
 autoUpdater.allowPrerelease = false;
+
+// Disable signature verification for unsigned apps
+if (process.platform === 'darwin') {
+  autoUpdater.disableWebInstaller = true;
+}
 
 // Add a delay to ensure the window is ready before checking
 setTimeout(() => {

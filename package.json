@@ -1,6 +1,6 @@
 {
   "name": "electron-dash-autoupdate",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "An Electron app with embedded Dash Python app and auto-update functionality",
   "main": "src/main.js",
   "scripts": {
@@ -47,6 +47,9 @@
       "hardenedRuntime": false,
       "entitlements": null,
       "entitlementsInherit": null,
+      "signIgnore": [
+        ".*"
+      ],
       "extendInfo": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
