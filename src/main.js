@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -26,6 +26,25 @@ function createWindow() {
 
   // Wait for Dash server to be ready before loading
   waitForDashServer();
+
+  // Create application menu
+  const template = [
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' }
+      ]
+    }
+  ];
+  
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 
   // Handle window closed
   mainWindow.on('closed', () => {
@@ -100,29 +119,52 @@ app.on('activate', () => {
 
 // Auto-updater events
 autoUpdater.on('checking-for-update', () => {
-  console.log('Checking for update...');
+  const message = 'Checking for update...';
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
+  }
 });
 
 autoUpdater.on('update-available', (info) => {
-  console.log('Update available:', info.version);
+  const message = `Update available: ${info.version}`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
+  }
 });
 
 autoUpdater.on('update-not-available', (info) => {
-  console.log('Update not available. Current version:', info.version);
+  const message = `Update not available. Current version: ${info.version}`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
+  }
 });
 
 autoUpdater.on('error', (err) => {
-  console.log('Error in auto-updater:', err);
+  const message = `Error in auto-updater: ${err.message || err}`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.executeJavaScript(`console.error('${message}')`);
+  }
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  console.log(log_message);
+  let message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
+  }
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded:', info.version);
-  autoUpdater.quitAndInstall();
+  const message = `Update downloaded: ${info.version}. Restarting app...`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
+  }
+  setTimeout(() => {
+    autoUpdater.quitAndInstall();
+  }, 1000);
 });
