@@ -117,53 +117,52 @@ app.on('activate', () => {
   }
 });
 
+// Function to safely log to renderer console
+function logToRenderer(message, isError = false) {
+  if (mainWindow && mainWindow.webContents) {
+    const safeMessage = message.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    const logFunction = isError ? 'console.error' : 'console.log';
+    mainWindow.webContents.executeJavaScript(`${logFunction}("${safeMessage}")`);
+  }
+}
+
 // Auto-updater events
 autoUpdater.on('checking-for-update', () => {
   const message = 'Checking for update...';
   console.log(message);
-  if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
-  }
+  logToRenderer(message);
 });
 
 autoUpdater.on('update-available', (info) => {
   const message = `Update available: ${info.version}`;
   console.log(message);
-  if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
-  }
+  logToRenderer(message);
+  // Automatically start downloading the update
+  autoUpdater.downloadUpdate();
 });
 
 autoUpdater.on('update-not-available', (info) => {
   const message = `Update not available. Current version: ${info.version}`;
   console.log(message);
-  if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
-  }
+  logToRenderer(message);
 });
 
 autoUpdater.on('error', (err) => {
   const message = `Error in auto-updater: ${err.message || err}`;
   console.log(message);
-  if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`console.error('${message}')`);
-  }
+  logToRenderer(message, true);
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-  let message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
+  let message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${Math.round(progressObj.percent)}% (${progressObj.transferred}/${progressObj.total})`;
   console.log(message);
-  if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
-  }
+  logToRenderer(message);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
   const message = `Update downloaded: ${info.version}. Restarting app...`;
   console.log(message);
-  if (mainWindow) {
-    mainWindow.webContents.executeJavaScript(`console.log('${message}')`);
-  }
+  logToRenderer(message);
   setTimeout(() => {
     autoUpdater.quitAndInstall();
   }, 1000);
