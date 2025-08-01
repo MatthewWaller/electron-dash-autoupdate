@@ -32,7 +32,7 @@ def update_output(hello_clicks, update_clicks):
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
     if button_id == 'hello-button' and hello_clicks > 0:
-        return "Hello friend!"
+        return "Hello friend 2!"
     elif button_id == 'update-button' and update_clicks > 0:
         # Trigger update check via JavaScript
         return html.Script('window.location.reload(); console.log("Manual update check triggered");')
