@@ -9,7 +9,19 @@ let dashProcess;
 
 // Configure auto-updater
 console.log('App version:', app.getVersion());
-autoUpdater.checkForUpdatesAndNotify();
+console.log('App name:', app.getName());
+console.log('Resources path:', process.resourcesPath);
+
+// Clear any cached update info
+autoUpdater.allowDowngrade = false;
+autoUpdater.allowPrerelease = false;
+
+// Add a delay to ensure the window is ready before checking
+setTimeout(() => {
+  console.log('Starting auto-updater check...');
+  console.log('Update URL:', autoUpdater.getFeedURL());
+  autoUpdater.checkForUpdatesAndNotify();
+}, 2000);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -29,6 +41,29 @@ function createWindow() {
 
   // Create application menu
   const template = [
+    {
+      label: 'App',
+      submenu: [
+        {
+          label: 'Check for Updates',
+          click: () => {
+            console.log('Manual update check triggered from menu');
+            logToRenderer('Manual update check triggered from menu');
+            autoUpdater.checkForUpdatesAndNotify();
+          }
+        },
+        {
+          label: 'Force Update Check',
+          click: () => {
+            console.log('Force update check - clearing cache');
+            logToRenderer('Force update check - clearing cache');
+            autoUpdater.checkForUpdates();
+          }
+        },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    },
     {
       label: 'View',
       submenu: [
