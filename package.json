@@ -1,6 +1,6 @@
 {
   "name": "electron-dash-autoupdate",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "An Electron app with embedded Dash Python app and auto-update functionality",
   "main": "src/main.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "build": {
     "appId": "com.example.electron-dash-autoupdate",
-    "productName": "Dash Auto Update Demo",
+    "productName": "Dash-Auto-Update-Demo",
     "directories": {
       "output": "dist"
     },

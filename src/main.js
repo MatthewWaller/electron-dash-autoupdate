@@ -25,6 +25,11 @@ autoUpdater.allowPrerelease = false;
 setTimeout(() => {
   console.log('Starting auto-updater check...');
   console.log('Update URL:', autoUpdater.getFeedURL());
+  
+  // Set some additional options
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  
   autoUpdater.checkForUpdatesAndNotify();
 }, 2000);
 
@@ -214,7 +219,14 @@ autoUpdater.on('update-not-available', (info) => {
 autoUpdater.on('error', (err) => {
   const message = `Error in auto-updater: ${err.message || err}`;
   console.log(message);
+  console.log('Error details:', err);
   logToRenderer(message, true);
+  
+  // If it's a download error, let's try to debug the URL
+  if (err.message && err.message.includes('Cannot download')) {
+    console.log('Feed URL:', autoUpdater.getFeedURL());
+    logToRenderer(`Feed URL: ${autoUpdater.getFeedURL()}`);
+  }
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
