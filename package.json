@@ -32,7 +32,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "your-username",
+      "owner": "MatthewWaller",
       "repo": "electron-dash-autoupdate"
     }
   },
@@ -43,6 +43,6 @@
   "dependencies": {
     "electron-updater": "^6.1.7"
   },
-  "author": "Your Name",
+  "author": "Matthew Waller",
   "license": "MIT"
 }
