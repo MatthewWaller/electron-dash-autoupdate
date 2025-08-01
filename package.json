@@ -28,7 +28,12 @@
         "target": "dmg",
         "arch": ["arm64"]
       },
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "identity": null,
+      "gatekeeperAssess": false,
+      "hardenedRuntime": false,
+      "entitlements": null,
+      "entitlementsInherit": null
     },
     "publish": {
       "provider": "github",
