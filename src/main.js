@@ -65,6 +65,19 @@ function createWindow() {
             autoUpdater.checkForUpdates();
           }
         },
+        {
+          label: 'Download Update Now',
+          click: () => {
+            console.log('Manual download triggered');
+            logToRenderer('Manual download triggered');
+            try {
+              autoUpdater.downloadUpdate();
+            } catch (error) {
+              console.error('Manual download error:', error);
+              logToRenderer(`Manual download error: ${error.message}`, true);
+            }
+          }
+        },
         { type: 'separator' },
         { role: 'quit' }
       ]
@@ -160,9 +173,9 @@ app.on('activate', () => {
 // Function to safely log to renderer console
 function logToRenderer(message, isError = false) {
   if (mainWindow && mainWindow.webContents) {
-    const safeMessage = message.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    // Use JSON.stringify to safely escape all special characters
     const logFunction = isError ? 'console.error' : 'console.log';
-    mainWindow.webContents.executeJavaScript(`${logFunction}("${safeMessage}")`);
+    mainWindow.webContents.executeJavaScript(`${logFunction}(${JSON.stringify(message)})`);
   }
 }
 
@@ -177,8 +190,19 @@ autoUpdater.on('update-available', (info) => {
   const message = `Update available: ${info.version}`;
   console.log(message);
   logToRenderer(message);
+  
   // Automatically start downloading the update
-  autoUpdater.downloadUpdate();
+  console.log('Starting download...');
+  logToRenderer('Starting download...');
+  
+  try {
+    autoUpdater.downloadUpdate();
+    console.log('Download triggered successfully');
+    logToRenderer('Download triggered successfully');
+  } catch (error) {
+    console.error('Error starting download:', error);
+    logToRenderer(`Error starting download: ${error.message}`, true);
+  }
 });
 
 autoUpdater.on('update-not-available', (info) => {
