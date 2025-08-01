@@ -1,6 +1,6 @@
 {
   "name": "electron-dash-autoupdate",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "An Electron app with embedded Dash Python app and auto-update functionality",
   "main": "src/main.js",
   "scripts": {
@@ -31,10 +31,16 @@
       }
     ],
     "mac": {
-      "target": {
-        "target": "dmg",
-        "arch": ["arm64"]
-      },
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ],
       "category": "public.app-category.developer-tools",
       "identity": null,
       "gatekeeperAssess": false,

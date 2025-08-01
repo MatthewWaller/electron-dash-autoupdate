@@ -53,6 +53,7 @@ jobs:
       with:
         files: |
           dist/*.dmg
+          dist/*.zip
           dist/latest-mac.yml
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
