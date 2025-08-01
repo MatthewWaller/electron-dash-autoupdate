@@ -23,6 +23,13 @@
       "dist/python/**/*",
       "node_modules/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "dist/python/",
+        "to": "python/",
+        "filter": ["**/*"]
+      }
+    ],
     "mac": {
       "target": {
         "target": "dmg",

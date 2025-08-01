@@ -45,8 +45,9 @@ function startDashApp() {
       env: { ...process.env, DASH_PORT: '8050' }
     });
   } else {
-    // Production mode - use PyInstaller executable
-    const pythonExe = path.join(__dirname, '..', 'dist', 'python', 'dash_app');
+    // Production mode - use PyInstaller executable from extraResources
+    const pythonExe = path.join(process.resourcesPath, 'python', 'dash_app');
+    console.log('Looking for Python executable at:', pythonExe);
     dashProcess = spawn(pythonExe, [], { 
       env: { ...process.env, DASH_PORT: '8050' }
     });
