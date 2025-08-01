@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-latest
@@ -50,7 +53,6 @@ jobs:
       with:
         files: |
           dist/*.dmg
-          dist/*.zip
           dist/latest-mac.yml
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}

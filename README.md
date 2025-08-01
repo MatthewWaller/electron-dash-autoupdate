@@ -73,6 +73,37 @@ npm run dist
 3. The app restarts to apply the update
 4. Users always have the latest version
 
+## Update example
+
+1. First, make sure your code is committed and pushed to GitHub:
+git add .
+git commit -m "Initial release with auto-update functionality"
+git push origin main
+
+2. Create and push a version tag:
+git tag v1.0.0
+git push origin v1.0.0
+
+3. The GitHub Action will automatically:
+- Build the Python app with PyInstaller
+- Build the Electron app with electron-builder
+- Create a GitHub release with the DMG file
+4. Check the build progress:
+- Go to your GitHub repo
+- Click on "Actions" tab
+- Watch the build process
+5. Download the DMG:
+- Once the build completes, go to "Releases" on your GitHub repo
+- You'll see the v1.0.0 release with the DMG file attached
+- Download and install it
+
+Note: The workflow condition if: startsWith(github.ref, 'refs/tags/') means it only
+creates releases when you push a tag (like v1.0.0), not on regular commits.
+
+If you want to create subsequent releases, just increment the version:
+git tag v1.0.1
+git push origin v1.0.1
+
 ## Project Structure
 
 ```
