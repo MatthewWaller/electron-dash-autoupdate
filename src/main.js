@@ -7,10 +7,15 @@ const http = require('http');
 let mainWindow;
 let dashProcess;
 
-// Configure auto-updater
+// Configure auto-updater - DIAGNOSTIC INFO
+console.log('=== DIAGNOSTIC INFO ===');
 console.log('App version:', app.getVersion());
 console.log('App name:', app.getName());
 console.log('Resources path:', process.resourcesPath);
+console.log('Is packaged:', app.isPackaged);
+console.log('Electron version:', process.versions.electron);
+console.log('Platform:', process.platform);
+console.log('======================');
 
 // Clear any cached update info
 autoUpdater.allowDowngrade = false;
