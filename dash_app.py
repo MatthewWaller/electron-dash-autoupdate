@@ -31,7 +31,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('DASH_PORT', 8050))
     
     # Run the app
-    app.run_server(
+    app.run(
         debug=False,
         host='127.0.0.1',
         port=port,

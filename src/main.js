@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const { spawn } = require('child_process');
+const http = require('http');
 
 let mainWindow;
 let dashProcess;
@@ -22,10 +23,8 @@ function createWindow() {
   // Start the Dash app
   startDashApp();
 
-  // Load the Dash app URL after a short delay to let it start
-  setTimeout(() => {
-    mainWindow.loadURL('http://127.0.0.1:8050');
-  }, 3000);
+  // Wait for Dash server to be ready before loading
+  waitForDashServer();
 
   // Handle window closed
   mainWindow.on('closed', () => {
@@ -37,14 +36,21 @@ function createWindow() {
 }
 
 function startDashApp() {
-  // Path to the Python executable created by PyInstaller
-  const pythonExe = path.join(__dirname, '..', 'dist', 'python', 'dash_app');
+  // In development, run Python directly. In production, use the PyInstaller executable
+  const isDev = process.argv.includes('--dev');
   
-  // Set environment variables
-  const env = { ...process.env, DASH_PORT: '8050' };
-  
-  // Start the Dash app process
-  dashProcess = spawn(pythonExe, [], { env });
+  if (isDev) {
+    // Development mode - run Python script directly
+    dashProcess = spawn('python', ['dash_app.py'], { 
+      env: { ...process.env, DASH_PORT: '8050' }
+    });
+  } else {
+    // Production mode - use PyInstaller executable
+    const pythonExe = path.join(__dirname, '..', 'dist', 'python', 'dash_app');
+    dashProcess = spawn(pythonExe, [], { 
+      env: { ...process.env, DASH_PORT: '8050' }
+    });
+  }
   
   dashProcess.stdout.on('data', (data) => {
     console.log(`Dash stdout: ${data}`);
@@ -57,6 +63,23 @@ function startDashApp() {
   dashProcess.on('close', (code) => {
     console.log(`Dash process exited with code ${code}`);
   });
+}
+
+function waitForDashServer() {
+  const checkServer = () => {
+    const req = http.get('http://127.0.0.1:8050', (res) => {
+      console.log('Dash server is ready, loading URL...');
+      mainWindow.loadURL('http://127.0.0.1:8050');
+    });
+    
+    req.on('error', (err) => {
+      console.log('Dash server not ready yet, retrying in 500ms...');
+      setTimeout(checkServer, 500);
+    });
+  };
+  
+  // Start checking after a short delay
+  setTimeout(checkServer, 1000);
 }
 
 app.whenReady().then(createWindow);
