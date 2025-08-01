@@ -21,7 +21,7 @@ A demonstration of auto-updating Electron applications with embedded Python Dash
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/electron-dash-autoupdate.git
+git clone https://github.com/MatthewWaller/electron-dash-autoupdate.git
 cd electron-dash-autoupdate
 ```
 
