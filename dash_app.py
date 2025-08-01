@@ -23,7 +23,7 @@ app.layout = html.Div([
 )
 def update_output(n_clicks):
     if n_clicks > 0:
-        return "Hello there!"
+        return "Hello friend!"
     return ""
 
 if __name__ == '__main__':

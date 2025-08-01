@@ -97,6 +97,8 @@ git push origin v1.0.0
 - You'll see the v1.0.0 release with the DMG file attached
 - Download and install it
 
+xattr -l "/Applications/Dash Auto Update Demo.app"
+
 Note: The workflow condition if: startsWith(github.ref, 'refs/tags/') means it only
 creates releases when you push a tag (like v1.0.0), not on regular commits.
 
