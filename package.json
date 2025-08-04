@@ -1,6 +1,6 @@
 {
   "name": "electron-dash-autoupdate",
-  "version": "1.0.32",
+  "version": "1.0.34",
   "description": "An Electron app with embedded Dash Python app and auto-update functionality",
   "main": "src/main.js",
   "scripts": {
@@ -47,6 +47,7 @@
       "entitlementsInherit": "entitlements.mac.plist",
       "identity": "Apple Development: Matthew Waller (NUT8MXUW86)",
       "gatekeeperAssess": false,
+      "notarize": true,
       "extendInfo": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true

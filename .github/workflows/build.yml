@@ -66,6 +66,9 @@ jobs:
         CSC_LINK: ${{ secrets.CERTIFICATE_P12 }}
         CSC_KEY_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
         CSC_IDENTITY: "Apple Development: Matthew Waller (NUT8MXUW86)"
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        TEAM_ID: ${{ secrets.TEAM_ID }}
       run: |
         # Debug: Check if entitlements file exists and is readable
         ls -la entitlements.mac.plist
@@ -92,39 +95,6 @@ jobs:
         
         # Final sign of the main app
         codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime dist/mac-arm64/Dash-Auto-Update-Demo.app
-
-    - name: Notarize App
-      if: startsWith(github.ref, 'refs/tags/')
-      env:
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-        TEAM_ID: ${{ secrets.TEAM_ID }}
-      run: |
-        # Post-signing verification
-        echo "=== Post-signing verification ==="
-        
-        # Check if the app is properly signed
-        codesign -dv --verbose=4 dist/mac-arm64/Dash-Auto-Update-Demo.app
-        
-        # Check for any unsigned components
-        find dist/mac-arm64/Dash-Auto-Update-Demo.app -type f -exec codesign -dv {} \; 2>&1 | grep -E "(not signed|invalid signature)" || echo "All components appear to be signed"
-        
-        # Check entitlements
-        codesign -d --entitlements :- dist/mac-arm64/Dash-Auto-Update-Demo.app
-        
-        # Check for hardened runtime
-        codesign -d --entitlements :- dist/mac-arm64/Dash-Auto-Update-Demo.app | grep -q "com.apple.security.cs.allow-jit" && echo "Hardened runtime enabled" || echo "Hardened runtime not properly configured"
-        
-        echo "=== Starting notarization ==="
-        
-        # Notarize the app
-        xcrun notarytool submit dist/*.dmg --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$TEAM_ID" --wait
-        
-        # Get detailed logs if notarization fails
-        if [ $? -ne 0 ]; then
-          echo "Notarization failed, getting detailed logs..."
-          xcrun notarytool log 72f4d0fe-d646-42cc-86e8-059c68803d54 --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$TEAM_ID"
-        fi
 
     - name: Release
       uses: softprops/action-gh-release@v1
