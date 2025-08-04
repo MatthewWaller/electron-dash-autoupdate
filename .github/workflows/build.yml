@@ -69,6 +69,7 @@ jobs:
         APPLE_ID: ${{ secrets.APPLE_ID }}
         APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
+        CSC_TEAM_ID: ${{ secrets.TEAM_ID }}
       run: |
         # Debug: Check if entitlements file exists and is readable
         ls -la entitlements.mac.plist
