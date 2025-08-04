@@ -23,7 +23,6 @@ mac:
   entitlementsInherit: entitlements.mac.plist
   gatekeeperAssess: false
   notarize: true
-  teamId: QBL739225X
   extendInfo:
     NSAppTransportSecurity:
       NSAllowsArbitraryLoads: true
