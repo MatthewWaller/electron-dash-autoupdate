@@ -67,7 +67,7 @@ jobs:
         CSC_KEY_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
         CSC_IDENTITY: "Apple Development: Matthew Waller (NUT8MXUW86)"
         APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
       run: |
         # Debug: Check if entitlements file exists and is readable
