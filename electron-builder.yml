@@ -23,6 +23,7 @@ mac:
   entitlementsInherit: entitlements.mac.plist
   identity: "Apple Development: Matthew Waller (NUT8MXUW86)"
   gatekeeperAssess: false
+  notarize: false
   extendInfo:
     NSAppTransportSecurity:
       NSAllowsArbitraryLoads: true
