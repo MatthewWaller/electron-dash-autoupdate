@@ -68,7 +68,7 @@ jobs:
         CSC_LINK: ${{ secrets.CERTIFICATE_P12 }}
         CSC_KEY_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
         APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.TEAM_ID }}
         # Enable code signing and notarization if certificate is available
         CSC_IDENTITY_AUTO_DISCOVERY: ${{ env.MACOS_CERTIFICATE != '' && 'true' || 'false' }}
