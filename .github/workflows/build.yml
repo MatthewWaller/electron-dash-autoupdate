@@ -74,9 +74,9 @@ jobs:
         security find-identity -v -p codesigning
         
         echo "=== Certificate Details ==="
-        CERT_IDENTITY=$(security find-identity -v -p codesigning | grep "Apple Development" | head -1 | awk '{print $2}')
+        CERT_IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID" | head -1 | awk '{print $2}')
         if [ -n "$CERT_IDENTITY" ]; then
-          echo "Found certificate: $CERT_IDENTITY"
+          echo "Found Developer ID certificate: $CERT_IDENTITY"
           echo "Certificate details:"
           
           # Try different methods to get certificate details
@@ -92,7 +92,7 @@ jobs:
           echo "Certificate validity check:"
           codesign -dv --verbose=4 /usr/bin/true 2>&1 | grep -E "(Authority:|TeamIdentifier:|Timestamp:)" || echo "Could not verify certificate validity"
         else
-          echo "ERROR: No Apple Development certificate found!"
+          echo "ERROR: No Developer ID certificate found!"
           exit 1
         fi
         
@@ -101,15 +101,15 @@ jobs:
         DEV_ID_CERT=$(security find-identity -v -p codesigning | grep "Developer ID" | head -1 | awk '{print $2}')
         if [ -n "$DEV_ID_CERT" ]; then
           echo "Found Developer ID certificate: $DEV_ID_CERT"
-          echo "NOTE: For notarization, you might need a Developer ID certificate instead of Apple Development"
+          echo "✅ Perfect! You have the correct certificate type for notarization."
         else
           echo "No Developer ID certificate found"
           echo ""
           echo "=== IMPORTANT: Certificate Type Issue ==="
-          echo "You are using an 'Apple Development' certificate, but notarization typically requires a 'Developer ID' certificate."
+          echo "You need a 'Developer ID Application' certificate for notarization."
           echo ""
           echo "Certificate types:"
-          echo "- Apple Development: For development and testing (what you have)"
+          echo "- Apple Development: For development and testing"
           echo "- Developer ID Application: For distribution and notarization (what you need)"
           echo ""
           echo "To fix this, you need to:"
