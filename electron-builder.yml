@@ -21,7 +21,7 @@ mac:
   hardenedRuntime: true
   entitlements: entitlements.mac.plist
   entitlementsInherit: entitlements.mac.plist
-  identity: "Apple Development: Matthew Waller (NUT8MXUW86)"
+  identity: "Developer ID Application: Cephalopod Studio LLC (QBL739225X)"
   gatekeeperAssess: false
   notarize: false
   extendInfo:

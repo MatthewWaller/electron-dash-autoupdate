@@ -52,6 +52,14 @@ jobs:
         echo "Certificates after manual import:"
         security find-identity -v -p codesigning
         
+        # Clean up duplicate certificates
+        echo "Cleaning up duplicate certificates..."
+        security delete-identity -Z "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" login.keychain || echo "No duplicates to clean"
+        
+        # Final check
+        echo "Final certificate list:"
+        security find-identity -v -p codesigning
+        
         # Clean up
         rm -f debug_cert.p12
 
@@ -70,10 +78,19 @@ jobs:
         if [ -n "$CERT_IDENTITY" ]; then
           echo "Found certificate: $CERT_IDENTITY"
           echo "Certificate details:"
-          security find-certificate -c "$CERT_IDENTITY" -p
           
-          echo "Certificate validity:"
-          security find-certificate -c "$CERT_IDENTITY" -p | openssl x509 -text -noout | grep -E "(Subject:|Issuer:|Not Before:|Not After:|X509v3 Extended Key Usage)"
+          # Try different methods to get certificate details
+          echo "Method 1 - Using identity hash:"
+          security find-certificate -Z "$CERT_IDENTITY" -p 2>/dev/null || echo "Method 1 failed"
+          
+          echo "Method 2 - Using certificate name:"
+          security find-certificate -c "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" -p 2>/dev/null || echo "Method 2 failed"
+          
+          echo "Method 3 - List all certificates:"
+          security find-certificate -a -p 2>/dev/null | head -20 || echo "Method 3 failed"
+          
+          echo "Certificate validity check:"
+          codesign -dv --verbose=4 /usr/bin/true 2>&1 | grep -E "(Authority:|TeamIdentifier:|Timestamp:)" || echo "Could not verify certificate validity"
         else
           echo "ERROR: No Apple Development certificate found!"
           exit 1
@@ -183,25 +200,25 @@ jobs:
             
             # Sign all helper apps
             echo "Signing helper apps..."
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper.app"
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (GPU).app"
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (Plugin).app"
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (Renderer).app"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper.app"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (GPU).app"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (Plugin).app"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (Renderer).app"
             
             # Sign frameworks
             echo "Signing frameworks..."
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Electron Framework.framework"
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Mantle.framework"
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/ReactiveObjC.framework"
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Squirrel.framework"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Electron Framework.framework"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Mantle.framework"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/ReactiveObjC.framework"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Squirrel.framework"
             
             # Sign the Python executable
             echo "Signing Python executable..."
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Resources/python/dash_app"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Resources/python/dash_app"
             
             # Final sign of the main app
             echo "Signing main app..."
-            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH"
+            codesign --force --sign "Developer ID Application: Cephalopod Studio LLC (QBL739225X)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH"
             
             echo "Code signing complete!"
           else
