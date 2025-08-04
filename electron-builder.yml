@@ -1,0 +1,35 @@
+appId: com.example.electron-dash-autoupdate
+productName: Dash-Auto-Update-Demo
+directories:
+  output: dist
+files:
+  - src/**/*
+  - dist/python/**/*
+  - node_modules/**/*
+  - entitlements.mac.plist
+extraResources:
+  - from: dist/python/
+    to: python/
+    filter: ["**/*"]
+mac:
+  target:
+    - target: dmg
+      arch: [arm64]
+    - target: zip
+      arch: [arm64]
+  category: public.app-category.developer-tools
+  hardenedRuntime: true
+  entitlements: entitlements.mac.plist
+  entitlementsInherit: entitlements.mac.plist
+  gatekeeperAssess: false
+  notarize: true
+  teamId: QBL739225X
+  extendInfo:
+    NSAppTransportSecurity:
+      NSAllowsArbitraryLoads: true
+dmg:
+  sign: false
+publish:
+  provider: github
+  owner: MatthewWaller
+  repo: electron-dash-autoupdate 

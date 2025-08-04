@@ -71,6 +71,20 @@ jobs:
         TEAM_ID: ${{ secrets.TEAM_ID }}
         CSC_TEAM_ID: ${{ secrets.TEAM_ID }}
       run: |
+        # Find the correct certificate identity
+        echo "=== Available certificates ==="
+        security find-identity -v -p codesigning build.keychain || security find-identity -v -p codesigning
+        
+        echo "=== Certificate details ==="
+        security find-identity -v -p codesigning build.keychain | grep "Apple Development" || security find-identity -v -p codesigning | grep "Apple Development"
+        
+        echo "=== Certificate identity details ==="
+        security find-identity -v -p codesigning build.keychain | head -1 | sed 's/^[[:space:]]*[0-9]*: //' || security find-identity -v -p codesigning | head -1 | sed 's/^[[:space:]]*[0-9]*: //'
+        
+        echo "=== Team ID from environment ==="
+        echo "TEAM_ID: $TEAM_ID"
+        echo "CSC_TEAM_ID: $CSC_TEAM_ID"
+        
         # Debug: Check if entitlements file exists and is readable
         ls -la entitlements.mac.plist
         cat entitlements.mac.plist

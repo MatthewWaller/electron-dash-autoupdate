@@ -12,57 +12,6 @@
     "dist": "electron-builder",
     "publish": "electron-builder --publish=always"
   },
-  "build": {
-    "appId": "com.example.electron-dash-autoupdate",
-    "productName": "Dash-Auto-Update-Demo",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "src/**/*",
-      "dist/python/**/*",
-      "node_modules/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "dist/python/",
-        "to": "python/",
-        "filter": ["**/*"]
-      }
-    ],
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["arm64"]
-        },
-        {
-          "target": "zip",
-          "arch": ["arm64"]
-        }
-      ],
-      "category": "public.app-category.developer-tools",
-      "hardenedRuntime": true,
-      "entitlements": "entitlements.mac.plist",
-      "entitlementsInherit": "entitlements.mac.plist",
-      "identity": "Apple Development: Matthew Waller (NUT8MXUW86)",
-      "gatekeeperAssess": false,
-      "notarize": true,
-      "extendInfo": {
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true
-        }
-      }
-    },
-    "dmg": {
-      "sign": false
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "MatthewWaller",
-      "repo": "electron-dash-autoupdate"
-    }
-  },
   "devDependencies": {
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1"
