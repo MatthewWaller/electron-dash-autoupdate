@@ -21,6 +21,40 @@ jobs:
         p12-file-base64: ${{ secrets.CERTIFICATE_P12 }}
         p12-password: ${{ secrets.CERTIFICATE_PASSWORD }}
 
+    - name: Debug Certificate Import
+      if: ${{ env.MACOS_CERTIFICATE != '' }}
+      run: |
+        echo "=== Debug Certificate Import ==="
+        echo "Checking if certificate was imported properly..."
+        
+        # List all certificates in the keychain
+        echo "All certificates in keychain:"
+        security find-identity -v -p codesigning
+        
+        # Check if the certificate file was created
+        echo "Checking for certificate file:"
+        ls -la certificate.p12 2>/dev/null || echo "certificate.p12 not found"
+        
+        # Try to decode the certificate again
+        echo "Decoding certificate from environment variable:"
+        echo "${{ secrets.CERTIFICATE_P12 }}" | base64 --decode > debug_cert.p12
+        ls -la debug_cert.p12
+        
+        # Check if the decoded file is valid
+        echo "Checking decoded certificate:"
+        file debug_cert.p12
+        
+        # Try importing manually
+        echo "Trying manual import:"
+        security import debug_cert.p12 -k login.keychain -P "${{ secrets.CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign || echo "Manual import failed"
+        
+        # Check again
+        echo "Certificates after manual import:"
+        security find-identity -v -p codesigning
+        
+        # Clean up
+        rm -f debug_cert.p12
+
     - name: Set up notarization credentials
       if: ${{ env.MACOS_CERTIFICATE != '' }}
       run: |
@@ -53,6 +87,20 @@ jobs:
           echo "NOTE: For notarization, you might need a Developer ID certificate instead of Apple Development"
         else
           echo "No Developer ID certificate found"
+          echo ""
+          echo "=== IMPORTANT: Certificate Type Issue ==="
+          echo "You are using an 'Apple Development' certificate, but notarization typically requires a 'Developer ID' certificate."
+          echo ""
+          echo "Certificate types:"
+          echo "- Apple Development: For development and testing (what you have)"
+          echo "- Developer ID Application: For distribution and notarization (what you need)"
+          echo ""
+          echo "To fix this, you need to:"
+          echo "1. Go to Apple Developer Portal"
+          echo "2. Create a 'Developer ID Application' certificate"
+          echo "3. Export it as .p12"
+          echo "4. Update your GitHub secrets"
+          echo ""
         fi
         
         # Test certificate signing capability
