@@ -25,6 +25,51 @@ jobs:
       if: ${{ env.MACOS_CERTIFICATE != '' }}
       run: |
         echo "Setting up notarization credentials..."
+        
+        # Verify the certificate first
+        echo "=== Certificate Verification ==="
+        echo "Available certificates:"
+        security find-identity -v -p codesigning
+        
+        echo "=== Certificate Details ==="
+        CERT_IDENTITY=$(security find-identity -v -p codesigning | grep "Apple Development" | head -1 | awk '{print $2}')
+        if [ -n "$CERT_IDENTITY" ]; then
+          echo "Found certificate: $CERT_IDENTITY"
+          echo "Certificate details:"
+          security find-certificate -c "$CERT_IDENTITY" -p
+          
+          echo "Certificate validity:"
+          security find-certificate -c "$CERT_IDENTITY" -p | openssl x509 -text -noout | grep -E "(Subject:|Issuer:|Not Before:|Not After:|X509v3 Extended Key Usage)"
+        else
+          echo "ERROR: No Apple Development certificate found!"
+          exit 1
+        fi
+        
+        # Check if we need a Developer ID certificate instead
+        echo "=== Checking for Developer ID Certificate ==="
+        DEV_ID_CERT=$(security find-identity -v -p codesigning | grep "Developer ID" | head -1 | awk '{print $2}')
+        if [ -n "$DEV_ID_CERT" ]; then
+          echo "Found Developer ID certificate: $DEV_ID_CERT"
+          echo "NOTE: For notarization, you might need a Developer ID certificate instead of Apple Development"
+        else
+          echo "No Developer ID certificate found"
+        fi
+        
+        # Test certificate signing capability
+        echo "=== Testing Certificate Signing ==="
+        TEST_FILE="/tmp/test_sign"
+        echo "test" > "$TEST_FILE"
+        
+        if codesign --force --sign "$CERT_IDENTITY" "$TEST_FILE" 2>/dev/null; then
+          echo "✅ Certificate can sign files successfully"
+          codesign -dv "$TEST_FILE"
+        else
+          echo "❌ Certificate cannot sign files"
+          echo "This might indicate the certificate is not suitable for code signing"
+        fi
+        
+        rm -f "$TEST_FILE"
+        
         # Store notarization credentials in keychain
         if [ -n "${{ secrets.APPLE_ID }}" ] && [ -n "${{ secrets.APPLE_ID_PASSWORD }}" ]; then
           xcrun notarytool store-credentials "notarytool-profile" \
@@ -78,6 +123,43 @@ jobs:
         
         # Build the app
         npm run dist
+        
+        # Manual code signing to ensure all components are signed
+        if [ -n "${{ env.MACOS_CERTIFICATE }}" ]; then
+          echo "=== Manual code signing ==="
+          
+          # Find the app bundle
+          APP_PATH=$(find dist -name "*.app" -type d | head -1)
+          if [ -n "$APP_PATH" ]; then
+            echo "Found app bundle: $APP_PATH"
+            
+            # Sign all helper apps
+            echo "Signing helper apps..."
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper.app"
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (GPU).app"
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (Plugin).app"
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Dash-Auto-Update-Demo Helper (Renderer).app"
+            
+            # Sign frameworks
+            echo "Signing frameworks..."
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Electron Framework.framework"
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Mantle.framework"
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/ReactiveObjC.framework"
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Frameworks/Squirrel.framework"
+            
+            # Sign the Python executable
+            echo "Signing Python executable..."
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH/Contents/Resources/python/dash_app"
+            
+            # Final sign of the main app
+            echo "Signing main app..."
+            codesign --force --sign "Apple Development: Matthew Waller (NUT8MXUW86)" --entitlements entitlements.mac.plist --options runtime "$APP_PATH"
+            
+            echo "Code signing complete!"
+          else
+            echo "No app bundle found for signing"
+          fi
+        fi
 
     - name: Verify code signing
       if: ${{ env.MACOS_CERTIFICATE != '' }}
