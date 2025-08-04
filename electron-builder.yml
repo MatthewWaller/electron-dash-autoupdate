@@ -24,6 +24,7 @@ mac:
   identity: "Apple Development: Matthew Waller (NUT8MXUW86)"
   gatekeeperAssess: false
   notarize: true
+  teamId: "NUT8MXUW86"
   extendInfo:
     NSAppTransportSecurity:
       NSAllowsArbitraryLoads: true
