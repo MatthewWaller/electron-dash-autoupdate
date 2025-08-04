@@ -21,13 +21,11 @@ mac:
   hardenedRuntime: true
   entitlements: entitlements.mac.plist
   entitlementsInherit: entitlements.mac.plist
+  identity: ${env.CSC_IDENTITY}
   gatekeeperAssess: false
-  notarize: true
   extendInfo:
     NSAppTransportSecurity:
       NSAllowsArbitraryLoads: true
-dmg:
-  sign: false
 publish:
   provider: github
   owner: MatthewWaller
