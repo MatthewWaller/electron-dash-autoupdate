@@ -113,17 +113,24 @@ jobs:
         echo "Creating zip file for notarization: $NOTARIZATION_ZIP"
         ditto -c -k --keepParent "$APP_PATH" "$NOTARIZATION_ZIP"
         
-        # Submit for notarization
+        # Submit for notarization and capture submission ID
         echo "Submitting app for notarization..."
-        xcrun notarytool submit "$NOTARIZATION_ZIP" \
-          --keychain-profile "notarytool-profile" \
-          --wait \
-          --timeout 30m
-        
+        NOTARIZATION_OUTPUT=$(xcrun notarytool submit "$NOTARIZATION_ZIP" --keychain-profile "notarytool-profile" --wait --timeout 30m 2>&1)
         NOTARIZATION_EXIT_CODE=$?
+        
+        echo "Notarization output:"
+        echo "$NOTARIZATION_OUTPUT"
+        
+        # Extract submission ID from output
+        SUBMISSION_ID=$(echo "$NOTARIZATION_OUTPUT" | grep "id:" | head -1 | awk '{print $2}')
         
         if [ $NOTARIZATION_EXIT_CODE -eq 0 ]; then
           echo "Notarization successful!"
+          
+          if [ -n "$SUBMISSION_ID" ]; then
+            echo "Getting detailed notarization logs for submission ID: $SUBMISSION_ID"
+            xcrun notarytool log "$SUBMISSION_ID" --keychain-profile "notarytool-profile"
+          fi
           
           # Staple the notarization to the app
           echo "Stapling notarization to app..."
@@ -134,6 +141,13 @@ jobs:
           xcrun stapler validate "$APP_PATH"
         else
           echo "Notarization failed with exit code $NOTARIZATION_EXIT_CODE"
+          echo "Getting detailed error logs..."
+          
+          if [ -n "$SUBMISSION_ID" ]; then
+            echo "Getting detailed notarization logs for submission ID: $SUBMISSION_ID"
+            xcrun notarytool log "$SUBMISSION_ID" --keychain-profile "notarytool-profile"
+          fi
+          
           echo "This may be due to missing credentials or Apple ID issues"
           echo "The app will still be signed but not notarized"
         fi
