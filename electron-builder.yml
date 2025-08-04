@@ -21,7 +21,7 @@ mac:
   hardenedRuntime: true
   entitlements: entitlements.mac.plist
   entitlementsInherit: entitlements.mac.plist
-  identity: "Developer ID Application: Cephalopod Studio LLC (QBL739225X)"
+  identity: "Cephalopod Studio LLC (QBL739225X)"
   gatekeeperAssess: false
   notarize: false
   extendInfo:
