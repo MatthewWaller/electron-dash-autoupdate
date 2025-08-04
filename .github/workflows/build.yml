@@ -80,8 +80,31 @@ jobs:
         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
       run: |
+        # Pre-notarization checks
+        echo "=== Pre-notarization checks ==="
+        
+        # Check if the app is properly signed
+        codesign -dv --verbose=4 dist/mac-arm64/Dash-Auto-Update-Demo.app
+        
+        # Check for any unsigned components
+        find dist/mac-arm64/Dash-Auto-Update-Demo.app -type f -exec codesign -dv {} \; 2>&1 | grep -E "(not signed|invalid signature)" || echo "All components appear to be signed"
+        
+        # Check entitlements
+        codesign -d --entitlements :- dist/mac-arm64/Dash-Auto-Update-Demo.app
+        
+        # Check for hardened runtime
+        codesign -d --entitlements :- dist/mac-arm64/Dash-Auto-Update-Demo.app | grep -q "com.apple.security.cs.allow-jit" && echo "Hardened runtime enabled" || echo "Hardened runtime not properly configured"
+        
+        echo "=== Starting notarization ==="
+        
         # Notarize the app
         xcrun notarytool submit dist/*.dmg --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$TEAM_ID" --wait
+        
+        # Get detailed logs if notarization fails
+        if [ $? -ne 0 ]; then
+          echo "Notarization failed, getting detailed logs..."
+          xcrun notarytool log c616bf1d-b71a-40a2-a38c-0b5b0a71b656 --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$TEAM_ID"
+        fi
 
     - name: Release
       uses: softprops/action-gh-release@v1
